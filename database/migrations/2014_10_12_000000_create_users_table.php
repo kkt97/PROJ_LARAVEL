@@ -16,14 +16,14 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('user_id')->unique()->comment('아이디'); // 추가함
+            $table->string('user_id', '15')->unique()->comment('아이디'); // 추가함
             $table->unsignedSmallInteger('user_level')->comment('권한'); // 추가함
-            $table->string('email')->unique();
+            $table->string('email', '30')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('phone'); // 추가함
-            $table->string('password');
-            $table->string('address');
-            $table->string('code');
+            $table->string('phone', '12'); // 추가함
+            $table->string('password','20');
+            $table->string('address', '300');
+            $table->string('code', '10');
             $table->rememberToken();
             $table->timestamps();
         });

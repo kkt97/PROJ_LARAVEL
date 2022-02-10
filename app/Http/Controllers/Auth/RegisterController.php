@@ -29,6 +29,17 @@ class RegisterController extends Controller
     {
         Log::info(__METHOD__);
 
+        Log::info($request);
+
+        $request->validate([
+            'user_id' => 'required|min:6|max:15|unique:users|string',
+            'email' => 'required|email|max:30|unique:users',
+            'phone' => 'required|regex:/(01)[0-9]{9}/',
+            'password' => 'required|min:8|max:20|confirmed',
+            'address' => 'required'
+        ]);
+
+
         $outs = User::create([
             'name' => $request->input('name'),
             'user_id' => $request->input('user_id'),
@@ -39,7 +50,6 @@ class RegisterController extends Controller
             'code' => $request->input('code'),
             'user_level' => config('ext.user.user_level.default'),
         ]);
-
 
         Log::info($outs);
 
