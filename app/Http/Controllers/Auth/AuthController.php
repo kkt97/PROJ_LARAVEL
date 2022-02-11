@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Validator;
 
@@ -32,38 +32,33 @@ class AuthController extends Controller
             'password' => 'required|min:8|max:20',
         ]);
 
-
-        Log::info('3');
-
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-
-        Log::info('1');
-
         try{
             $user = User::where('user_id', $request->user_id)
-                ->where('password', bcrypt($request->password))
                 ->first();
+
+            Log::info($user->password);
+            Log::info($request->password);
+            if (Hash::check($request->password, $user->password)){
+                Log::info('same');
+            } else {
+                Log::info('diff');
+            }
 
         }catch(\Exception $e){
             Log::info($e->getMessage());
         }
 
-        if(!$user){
-            Log::info('fail');
-        }
-
-        Log::info('4');
+//        $user_ = auth()->attempt([$request->all()]);
+//        Log::info($user_);
 
         if (! $token = auth()->attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-
-        // validator에서 422에러가 나면 validator에 관한 에러
-        // 401에 대한 에러가 나면 토큰에러?
         return $this->createNewToken($token);
 
         //todo 로그인 정보확인 및 validation
