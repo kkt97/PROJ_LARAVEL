@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Board;
 use App\Http\Controllers\Controller;
 use App\Models\Board\Board;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class BoardsController extends Controller
 {
@@ -70,8 +72,6 @@ class BoardsController extends Controller
     {
         $board->load('user');
 
-        Log::info($board);
-
         return json_encode($board);
     }
 
@@ -84,7 +84,33 @@ class BoardsController extends Controller
      */
     public function update(Request $request, Board $board)
     {
-        //
+        Log::info(__METHOD__);
+        Log::info($request);
+
+        $modeFileDelete = $request->modeFileDelete;
+        Log::info($modeFileDelete);
+
+        if($modeFileDelete) {
+
+            $image_path = $request->image_path;
+
+//            Log::info($image_path);
+
+
+            Storage::disk('')->delete($image_path);
+
+//            Log::info($modeFileDelete);
+            $outs = $board->update([
+                'image_name' => NULL,
+                'image_path' => NULL,
+            ]);
+//            Log::info($outs);
+
+        } else {
+            $outs = $board->update($request->all());
+        }
+
+        return json_encode($outs);
     }
 
     /**
