@@ -26,7 +26,6 @@ class AuthController extends Controller
      */
     public function login(Request $request){
 
-        Log::info('1');
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|min:6|max:15|string',
