@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Board;
 use App\Http\Controllers\Controller;
 use App\Models\Board\Board;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -94,17 +93,12 @@ class BoardsController extends Controller
 
             $image_path = $request->image_path;
 
-//            Log::info($image_path);
-
-
             Storage::disk('')->delete($image_path);
 
-//            Log::info($modeFileDelete);
             $outs = $board->update([
                 'image_name' => NULL,
                 'image_path' => NULL,
             ]);
-//            Log::info($outs);
 
         } else {
             $outs = $board->update($request->all());
@@ -125,6 +119,32 @@ class BoardsController extends Controller
 
         $outs = $board->delete();
 
+        return json_encode($outs);
+    }
+
+    public function search(Request $request){
+        Log::info(__METHOD__);
+        Log::info($request);
+
+        $search = $request->get('q');
+
+        Log::info($search);
+
+        $outs = Board::query();
+        $outs->with('user')->paginate(10);
+        Log::info($outs->toSql());
+
+        if($search) {
+            $outs->where(function ($q) use ($search) {
+                $q->orWhere('title', 'like', '%'.$search.'%');
+                $q->orWhere('content', 'like', '%'.$search.'%');
+                $q->orWhereHas('user', function ($user) use ($search) {
+                    $user->where('name', 'like', '%'.$search.'%');
+                });
+            });
+        }
+        $outs = $outs->get();
+        Log::info($outs);
         return json_encode($outs);
     }
 }

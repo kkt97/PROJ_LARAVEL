@@ -26,9 +26,15 @@ Route::group([
     Route::get('/loginCheck', [\App\Http\Controllers\Auth\AuthController::class, 'loginCheck']);
 });
 
+Route::get('/board/search', [App\Http\Controllers\Board\BoardsController::class, 'search']);
+
 
 Route::apiResources([
     '/register' => \App\Http\Controllers\Auth\RegisterController::class,
     '/board' => \App\Http\Controllers\Board\BoardsController::class,
 ]);
 
+
+
+//DB::listen(function($query) { \Illuminate\Support\Facades\Log::info($query->sql); });
+//DB::listen(function($query) { dump($query->sql); });
