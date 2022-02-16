@@ -26,12 +26,16 @@ Route::group([
     Route::get('/loginCheck', [\App\Http\Controllers\Auth\AuthController::class, 'loginCheck']);
 });
 
+
+
 Route::get('/board/search', [App\Http\Controllers\Board\BoardsController::class, 'search']);
+Route::post('/board/{id}', [App\Http\Controllers\Board\BoardsController::class, 'upload']);
 
 
 Route::apiResources([
     '/register' => \App\Http\Controllers\Auth\RegisterController::class,
     '/board' => \App\Http\Controllers\Board\BoardsController::class,
+    '/booking' => \App\Http\Controllers\Booking\BookingController::class,
 ]);
 
 

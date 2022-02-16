@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->unsignedSmallInteger('user_level')->comment('권한'); // 추가함
             $table->string('email', '30')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('phone', '12'); // 추가함
+            $table->string('phone', '30'); // 추가함
             $table->string('password','20');
             $table->string('address', '300');
             $table->string('code', '10');

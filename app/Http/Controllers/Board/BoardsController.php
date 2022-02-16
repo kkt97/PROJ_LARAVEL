@@ -11,20 +11,72 @@ use Illuminate\Support\Facades\Storage;
 class BoardsController extends Controller
 {
     /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Board\Board  $board
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Board $board)
+    {
+        Log::info(__METHOD__);
+
+        $outs = $board->delete();
+
+        return json_encode($outs);
+    }
+
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        Log::info(__METHOD__);
-
         $outs = Board::with('user')->paginate(10);
-
-        Log::info($outs);
 
         return json_encode($outs);
     }
+    public function search(Request $request){
+        Log::info(__METHOD__);
+        Log::info($request);
+
+        $search = $request->get('q');
+
+        Log::info($search);
+
+        $outs = Board::query();
+        $outs->with('user')->paginate(10);
+        Log::info($outs->toSql());
+
+        if($search) {
+            $outs->where(function ($q) use ($search) {
+                $q->orWhere('title', 'like', '%'.$search.'%');
+                $q->orWhere('content', 'like', '%'.$search.'%');
+                $q->orWhereHas('user', function ($user) use ($search) {
+                    $user->where('name', 'like', '%'.$search.'%');
+                });
+            });
+        }
+        $outs = $outs->get();
+        Log::info($outs);
+        return json_encode($outs);
+    }
+
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Board\Board  $board
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Board $board)
+    {
+        $board->load('user');
+
+        return json_encode($board);
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -35,6 +87,9 @@ class BoardsController extends Controller
     public function store(Request $request)
     {
         Log::info($request->all());
+
+        Log::info($request->file());
+
         Log::info(__METHOD__);
 
         $outs = Board::with('user')->create($request->all());
@@ -61,18 +116,6 @@ class BoardsController extends Controller
         return json_encode($outs);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Board\Board  $board
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Board $board)
-    {
-        $board->load('user');
-
-        return json_encode($board);
-    }
 
     /**
      * Update the specified resource in storage.
@@ -84,7 +127,8 @@ class BoardsController extends Controller
     public function update(Request $request, Board $board)
     {
         Log::info(__METHOD__);
-        Log::info($request);
+        Log::info($request->all());
+        Log::info($request->file());
 
         $modeFileDelete = $request->modeFileDelete;
         Log::info($modeFileDelete);
@@ -103,48 +147,37 @@ class BoardsController extends Controller
         } else {
             $outs = $board->update($request->all());
         }
-
         return json_encode($outs);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Board\Board  $board
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Board $board)
-    {
-        Log::info(__METHOD__);
 
-        $outs = $board->delete();
+    public function upload(Request $request, $id){
+        Log::info($request->all());
 
-        return json_encode($outs);
-    }
+        $board = Board::find($id);
+        Log::info($board);
 
-    public function search(Request $request){
-        Log::info(__METHOD__);
-        Log::info($request);
-
-        $search = $request->get('q');
-
-        Log::info($search);
-
-        $outs = Board::query();
-        $outs->with('user')->paginate(10);
-        Log::info($outs->toSql());
-
-        if($search) {
-            $outs->where(function ($q) use ($search) {
-                $q->orWhere('title', 'like', '%'.$search.'%');
-                $q->orWhere('content', 'like', '%'.$search.'%');
-                $q->orWhereHas('user', function ($user) use ($search) {
-                    $user->where('name', 'like', '%'.$search.'%');
-                });
-            });
+        if ($request->file('image')){
+            try {
+                Log::info('0');
+                $fileName = time().'_'.$request->file('image')
+                        ->getClientOriginalName();
+                Log::info('1');
+                $path = $request->file('image')->storeAs('/public/images',
+                    $fileName);
+                Log::info('2');
+                $board->image_name = $fileName;
+                $board->image_path = $path;
+                Log::info('3');
+            } catch (\Exception $e){
+                Log::info($e->getMessage());
+            }
         }
-        $outs = $outs->get();
-        Log::info($outs);
-        return json_encode($outs);
+        $board->update([
+            'image_name'
+        ]);
+
+        return json_encode($board);
+
     }
 }
