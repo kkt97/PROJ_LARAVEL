@@ -24,9 +24,7 @@ class CreateBooksTable extends Migration
 
             $table->string('email', '30');
 
-            $table->string('book_time')->unique();
-
-            $table->string('book_date')->unique();
+            $table->date('book_time')->unique();
 
             $table->timestamps();
         });

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Board;
 
 use App\Http\Controllers\Controller;
 use App\Models\Board\Board;
+use App\Models\Book\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class BoardsController extends Controller
 {
@@ -18,10 +20,11 @@ class BoardsController extends Controller
      */
     public function destroy(Board $board)
     {
-        Log::info(__METHOD__);
-
+//        Log::info(__METHOD__);
+        $image_name = storage_path("app/public/images/{$board->image_name}");
+//        Log::info($image_name);
+        File::delete($image_name);
         $outs = $board->delete();
-
         return json_encode($outs);
     }
 
@@ -136,6 +139,7 @@ class BoardsController extends Controller
         if($modeFileDelete) {
 
             $image_path = $request->image_path;
+            Log::info($image_path);
 
             Storage::disk('')->delete($image_path);
 

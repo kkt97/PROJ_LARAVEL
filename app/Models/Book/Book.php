@@ -15,6 +15,5 @@ class Book extends Model
       'phone',
       'email',
       'book_time',
-      'book_date',
     ];
 }

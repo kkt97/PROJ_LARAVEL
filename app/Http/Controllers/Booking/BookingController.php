@@ -16,7 +16,13 @@ class BookingController extends Controller
      */
     public function index()
     {
-        //
+        Log::info(__METHOD__);
+
+        $outs = Book::all();
+
+        Log::info($outs);
+
+        return json_encode($outs);
     }
 
     /**
@@ -44,7 +50,6 @@ class BookingController extends Controller
             'phone' => $request->input('phone'),
             'email' => $request->input('email'),
             'book_time' => $request->input('book_time'),
-            'book_date' => $request->input('book_date')
         ]);
 
         Log::info($outs);
