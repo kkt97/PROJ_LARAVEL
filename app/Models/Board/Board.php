@@ -16,6 +16,9 @@ class Board extends Model
         'content',
         'image_name',
         'image_path',
+        'image_name_2',
+        'image_path_2'
+
     ];
 
     public function user()

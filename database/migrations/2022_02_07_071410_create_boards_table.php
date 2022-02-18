@@ -24,6 +24,10 @@ class CreateBoardsTable extends Migration
 
             $table->text('image_path')->nullable();
 
+            $table->text('image_name_2')->nullable();
+
+            $table->text('image_path_2')->nullable();
+
             $table->unsignedBigInteger('user_id')->comment('')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users')->nullable();
